@@ -152,7 +152,7 @@ class $1_cls
 {
 public:
     $1_cls();
-    ~$1_cls();
+    virtual ~$1_cls();
 
     double double_var;
     bool bool_var;

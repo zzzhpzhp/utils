@@ -12,8 +12,10 @@ echo "
 #ifndef $name
 #define $name
 
-// http://docs.ros.org/api/rosconsole/html/dir_16d3284317caf78c0e25eb64bbba3d38.html
+// http://docs.ros.org/diamondback/api/roscpp/html/classros_1_1NodeHandle.html
 #include <ros/ros.h>
+
+// http://docs.ros.org/api/rosconsole/html/dir_16d3284317caf78c0e25eb64bbba3d38.html
 #include <ros/assert.h>
 
 // http://docs.ros.org/jade/api/tf/html/c++/namespacetf.html
@@ -139,6 +141,11 @@ echo "
 #include <type_traits>
 #include <utility>
 #include <valarray>
+#include <atomic>
+#include <condition_variable>
+#include <future>
+#include <mutex>
+#include <thread>
 
 
 class $1_cls
@@ -147,7 +154,22 @@ public:
     $1_cls();
     ~$1_cls();
 
+    double double_var;
+    bool bool_var;
+    std::string string_var;
+
 private:
+    geometry_msgs::Twist twist_topic_;
+
+    ros::Subscriber topic_sub_;
+    ros::Publisher topic_pub_;
+
+    std::thread thread_name_;
+
+    ros::Timer timer_;
+    void thread_function_();
+    void topic_callback_function_(const geometry_msgs::Twist::ConstPtr &msg);
+    void timer_callback_function_(const ros::TimerEvent& event);
 
 protected:
 };
@@ -160,12 +182,46 @@ echo "
 
 $1_cls::$1_cls()
 {
+    ros::NodeHandle nh_(\"~\");
 
+    nh_.param(\"param_description\", double_var, 1.0);
+    nh_.param(\"param_description\", bool_var, true);
+    nh_.param(\"param_description\", string_var, std::string(\"xxx\"));
+
+    topic_sub_ = nh_.subscribe<geometry_msgs::Twist>(\"/cmd_vel\", 1, boost::bind(&comprehensive_planner_cls::topic_callback_function_, this, _1) );
+    topic_pub_ = nh_.advertise<geometry_msgs::Twist>(\"/cmd_vel_\", 1);
+
+    thread_name_ = std::thread(boost::bind(&comprehensive_planner_cls::thread_function_, this));
+
+    timer_ =  nh_.createTimer(1.0, &$1_cls::timer_callback_function_, this, false, false);  // one_shot=false(default), auto_start=false
+    timer_.start();
 }
 
 $1_cls::~$1_cls()
 {
+    thread_name_.join();
+}
 
+void $1_cls::thread_function_()
+{
+    ros::Rate rate(10);
+
+    while (ros::ok())
+    {
+        ROS_INFO(\"Thread function...\");
+        topic_pub_.publish(twist_topic_);
+        rate.sleep();
+    }
+}
+
+void $1_cls::topic_callback_function_(const geometry_msgs::Twist::ConstPtr &msg)
+{
+    ROS_WARN(\"Received topic...\");
+}
+
+void $1_cls::timer_callback_function_(const ros::TimerEvent& event)
+{
+    ROS_ERROR(\"Timer callback...\");
 }
 "  >> ./$1/src/$1.cpp
 

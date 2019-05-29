@@ -1,0 +1,1 @@
+catkin_create_pkg $1 std_msgs roscpp geometry_msgs tf dynamic_reconfigure sensor_msgs nav_msgs visualization_msgs  interactive_markers pluginlib rospy tf_conversions std_srvs actionlib_msgs move_base_msgs forwardx_nav_msgs forwardx_motor_msgs actionlib forwardx_nav_core forwardx_nav_utils forwardx_nav_adapter  forwardx_nav_grid xmlrpcpp yaml-cpp forwardx_motor 

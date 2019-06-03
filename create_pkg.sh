@@ -1,4 +1,5 @@
-catkin_create_pkg $1 std_msgs roscpp geometry_msgs tf dynamic_reconfigure sensor_msgs nav_msgs visualization_msgs  interactive_markers pluginlib rospy tf_conversions std_srvs actionlib_msgs move_base_msgs forwardx_nav_msgs forwardx_motor_msgs actionlib forwardx_nav_core forwardx_nav_utils forwardx_nav_adapter  forwardx_nav_grid xmlrpcpp forwardx_motor angles
+catkin_create_pkg $1   std_msgs roscpp geometry_msgs tf dynamic_reconfigure sensor_msgs nav_msgs visualization_msgs  interactive_markers pluginlib rospy tf_conversions std_srvs actionlib_msgs move_base_msgs actionlib message_runtime message_generation  pcl_conversions xmlrpcpp  angles
+# nav_core costmap_2d forwardx_costmap_2d forwardx_local_planner_ros forwardx_nav_msgs  forwardx_motor_msgs forwardx_nav_core forwardx_nav_utils forwardx_nav_adapter  forwardx_nav_grid forwardx_motor eigen
 
 touch ./$1/src/$1.cpp
 touch ./$1/src/$1_node.cpp
@@ -188,10 +189,10 @@ $1_cls::$1_cls()
     nh_.param(\"param_description\", bool_var, true);
     nh_.param(\"param_description\", string_var, std::string(\"xxx\"));
 
-    topic_sub_ = nh_.subscribe<geometry_msgs::Twist>(\"/cmd_vel\", 1, boost::bind(&comprehensive_planner_cls::topic_callback_function_, this, _1) );
+    topic_sub_ = nh_.subscribe<geometry_msgs::Twist>(\"/cmd_vel\", 1, boost::bind(&$1_cls::topic_callback_function_, this, _1) );
     topic_pub_ = nh_.advertise<geometry_msgs::Twist>(\"/cmd_vel_\", 1);
 
-    thread_name_ = std::thread(boost::bind(&comprehensive_planner_cls::thread_function_, this));
+    thread_name_ = std::thread(boost::bind(&$1_cls::thread_function_, this));
 
     timer_ =  nh_.createTimer(1.0, &$1_cls::timer_callback_function_, this, false, false);  // one_shot=false(default), auto_start=false
     timer_.start();

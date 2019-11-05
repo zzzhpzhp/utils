@@ -296,15 +296,14 @@ int main(int argc, char **argv)
 }
 " >> ./$1/src/$1_node.cpp
 
-echo "
-<?xml version=\"1.0\"?>
+echo "<?xml version=\"1.0\"?>
 
 <launch>
     <arg name=\"debug\" default=\"false\" />
-    <arg if=\"$(arg debug)\" name=\"launch_prefix\" value=\"xterm -e gdb --args \" />
-    <arg unless=\"$(arg debug)\" name=\"launch_prefix\" value=\"\" />
+    <arg if=\"\$(arg debug)\" name=\"launch_prefix\" value=\"xterm -e gdb --args \" />
+    <arg unless=\"\$(arg debug)\" name=\"launch_prefix\" value=\"\" />
 
-    <node pkg=\"$1\" type=\"$1_node\" respawn=\"false\" name=\"$1\" output=\"screen\" launch-prefix=\"$(arg launch_prefix)\">
+    <node pkg=\"$1\" type=\"$1_node\" respawn=\"false\" name=\"$1\" output=\"screen\" launch-prefix=\"\$(arg launch_prefix)\">
         <rosparam>
         </rosparam>
     </node>

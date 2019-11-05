@@ -13,8 +13,7 @@ touch ./$1/launch/$1.launch
 typeset -u name
 name="__$1_h__"
 
-echo "
-#ifndef $name
+echo "#ifndef $name
 #define $name
 
 // http://docs.ros.org/diamondback/api/roscpp/html/classros_1_1NodeHandle.html
@@ -230,8 +229,7 @@ protected:
 #endif
 " >> ./$1/include/$1/$1.h
 
-echo "
-#include <$1/$1.h>
+echo "#include <$1/$1.h>
 
 $1_cls::$1_cls()
 {
@@ -279,8 +277,7 @@ void $1_cls::timer_callback_function_(const ros::TimerEvent& event)
 "  >> ./$1/src/$1.cpp
 
 
-echo "
-#include <$1/$1.h>
+echo "#include <$1/$1.h>
 
 int main(int argc, char **argv)
 {

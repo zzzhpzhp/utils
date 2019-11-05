@@ -1,10 +1,14 @@
-catkin_create_pkg $1   std_msgs roscpp geometry_msgs tf dynamic_reconfigure sensor_msgs nav_msgs visualization_msgs  interactive_markers pluginlib rospy tf_conversions std_srvs actionlib_msgs move_base_msgs actionlib message_runtime message_generation  pcl_conversions xmlrpcpp  angles
-# nav_core costmap_2d forwardx_costmap_2d forwardx_local_planner_ros forwardx_nav_msgs  forwardx_motor_msgs forwardx_nav_core forwardx_nav_utils forwardx_nav_adapter  forwardx_nav_grid forwardx_motor eigen
+catkin_create_pkg $1 forwardx_global_planner_ros forwardx_costmap_2d forwardx_local_planner_ros forwardx_nav_msgs  forwardx_motor_msgs forwardx_nav_core forwardx_nav_utils forwardx_nav_adapter  forwardx_nav_grid forwardx_motor  std_msgs roscpp geometry_msgs tf dynamic_reconfigure sensor_msgs nav_msgs visualization_msgs  interactive_markers pluginlib rospy tf_conversions std_srvs actionlib_msgs move_base_msgs actionlib message_runtime message_generation  pcl_conversions xmlrpcpp  angles
+# nav_core costmap_2d forwardx_global_planner_ros forwardx_costmap_2d forwardx_local_planner_ros forwardx_nav_msgs  forwardx_motor_msgs forwardx_nav_core forwardx_nav_utils forwardx_nav_adapter  forwardx_nav_grid forwardx_motor eigen
+
+mkdir ./$1/launch
+mkdir ./$1/src
+mkdir ./$1/include/$1
 
 touch ./$1/src/$1.cpp
 touch ./$1/src/$1_node.cpp
-
 touch ./$1/include/$1/$1.h
+touch ./$1/launch/$1.launch
 
 typeset -u name
 name="__$1_h__"
@@ -22,7 +26,7 @@ echo "
 // http://docs.ros.org/jade/api/tf/html/c++/namespacetf.html
 #include <tf/tf.h>
 
-// msg
+// geometry_msgs
 // http://docs.ros.org/api/geometry_msgs/html/index-msg.html
 #include <geometry_msgs/Accel.h>
 #include <geometry_msgs/AccelStamped.h>
@@ -53,7 +57,7 @@ echo "
 #include <geometry_msgs/Wrench.h>
 #include <geometry_msgs/WrenchStamped.h>
 
-// msg
+// nav_msgs
 // http://docs.ros.org/kinetic/api/nav_msgs/html/index-msg.html
 #include <nav_msgs/Path.h>
 #include <nav_msgs/GridCells.h>
@@ -68,7 +72,7 @@ echo "
 // http://docs.ros.org/jade/api/angles/html/namespaceangles.html
 #include <angles/angles.h>
 
-//msg
+// sensor_msgs
 // http://docs.ros.org/jade/api/sensor_msgs/html/index-msg.html
 #include <sensor_msgs/BatteryState.h>
 #include <sensor_msgs/CameraInfo.h>
@@ -100,7 +104,7 @@ echo "
 //srv
 #include <sensor_msgs/SetCameraInfo.h>
 
-// msg
+// visualization_msgs
 // http://docs.ros.org/api/visualization_msgs/html/index-msg.html
 #include <visualization_msgs/ImageMarker.h>
 #include <visualization_msgs/InteractiveMarker.h>
@@ -147,6 +151,54 @@ echo "
 #include <future>
 #include <mutex>
 #include <thread>
+
+
+// costmap2d
+#include <forwardx_costmap_2d/forwardx_costmap_2d.h>
+#include <forwardx_costmap_2d/costmap_2d_publisher.h>
+#include <forwardx_costmap_2d/costmap_2d_ros.h>
+#include <forwardx_costmap_2d/cost_values.h>
+#include <forwardx_costmap_2d/costmap_math.h>
+
+// forwardx_local_planner_ros
+#include <forwardx_local_planner_ros/world_model.h>
+#include <forwardx_local_planner_ros/point_grid.h>
+#include <forwardx_local_planner_ros/costmap_model.h>
+#include <forwardx_local_planner_ros/voxel_grid_model.h>
+#include <forwardx_local_planner_ros/trajectory_planner.h>
+#include <forwardx_local_planner_ros/map_grid_visualizer.h>
+#include <forwardx_local_planner_ros/planar_laser_scan.h>
+#include <forwardx_local_planner_ros/BaseLocalPlannerConfig.h>
+#include <forwardx_local_planner_ros/odometry_helper_ros.h>
+#include <forwardx_local_planner_ros/map_cell.h>
+#include <forwardx_local_planner_ros/map_grid.h>
+#include <forwardx_local_planner_ros/footprint_helper.h>
+#include <forwardx_local_planner_ros/trajectory.h>
+#include <forwardx_local_planner_ros/Position2DInt.h>
+#include <forwardx_local_planner_ros/goal_functions.h>
+
+// eigen
+// #include \"Eigen/Dense\"
+
+// forwardx_nav_core
+#include <forwardx_nav_core/global_planner.h>
+#include <forwardx_nav_core/common.h>
+#include <forwardx_nav_core/costmap.h>
+#include <forwardx_nav_core/exceptions.h>
+
+// forwardx_msgs
+#include <forwardx_nav_msgs/Path2D.h>
+#include <forwardx_nav_msgs/Point2D.h>
+#include <forwardx_nav_msgs/Pose2DStamped.h>
+
+// pluginlib
+#include <pluginlib/class_list_macros.h>
+
+// adapter
+#include <forwardx_nav_adapter/costmap_adapter.h>
+
+// forwardx_global_planner_ros
+#include <forwardx_global_planner_ros/orientation_filter.h>
 
 
 class $1_cls
@@ -243,3 +295,18 @@ int main(int argc, char **argv)
     return 0;
 }
 " >> ./$1/src/$1_node.cpp
+
+echo "
+<?xml version=\"1.0\"?>
+
+<launch>
+    <arg name=\"debug\" default=\"false\" />
+    <arg if=\"$(arg debug)\" name=\"launch_prefix\" value=\"xterm -e gdb --args \" />
+    <arg unless=\"$(arg debug)\" name=\"launch_prefix\" value=\"\" />
+
+    <node pkg=\"$1\" type=\"$1_node\" respawn=\"false\" name=\"$1\" output=\"screen\" launch-prefix=\"$(arg launch_prefix)\">
+        <rosparam>
+        </rosparam>
+    </node>
+</launch>
+" >> ./$1/launch/$1.launch

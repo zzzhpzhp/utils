@@ -1,6 +1,8 @@
 catkin_create_pkg $1 forwardx_global_planner_ros forwardx_costmap_2d forwardx_local_planner_ros forwardx_nav_msgs  forwardx_motor_msgs forwardx_nav_core forwardx_nav_utils forwardx_nav_adapter  forwardx_nav_grid forwardx_motor  std_msgs roscpp geometry_msgs tf dynamic_reconfigure sensor_msgs nav_msgs visualization_msgs  interactive_markers pluginlib rospy tf_conversions std_srvs actionlib_msgs move_base_msgs actionlib message_runtime message_generation  pcl_conversions xmlrpcpp  angles
 # nav_core costmap_2d forwardx_global_planner_ros forwardx_costmap_2d forwardx_local_planner_ros forwardx_nav_msgs  forwardx_motor_msgs forwardx_nav_core forwardx_nav_utils forwardx_nav_adapter  forwardx_nav_grid forwardx_motor eigen
 
+mkdir ./$1/param
+mkdir ./$1/cfg
 mkdir ./$1/launch
 mkdir ./$1/src
 mkdir ./$1/include/$1

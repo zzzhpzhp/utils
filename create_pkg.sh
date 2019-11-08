@@ -201,12 +201,14 @@ echo "#ifndef $name
 // forwardx_global_planner_ros
 #include <forwardx_global_planner_ros/orientation_filter.h>
 
+namespace $1
+{
 
-class $1_cls
+class $1
 {
 public:
-    $1_cls();
-    virtual ~$1_cls();
+    $1();
+    virtual ~$1();
 
     double double_var;
     bool bool_var;
@@ -228,12 +230,16 @@ private:
 protected:
 };
 
+}
 #endif
 " >> ./$1/include/$1/$1.h
 
 echo "#include <$1/$1.h>
 
-$1_cls::$1_cls()
+namespace $1
+{
+
+$1::$1()
 {
     ros::NodeHandle nh_(\"~\");
 
@@ -241,21 +247,21 @@ $1_cls::$1_cls()
     nh_.param(\"param_description\", bool_var, true);
     nh_.param(\"param_description\", string_var, std::string(\"xxx\"));
 
-    topic_sub_ = nh_.subscribe<geometry_msgs::Twist>(\"/cmd_vel\", 1, boost::bind(&$1_cls::topic_callback_function_, this, _1) );
+    topic_sub_ = nh_.subscribe<geometry_msgs::Twist>(\"/cmd_vel\", 1, boost::bind(&$1::topic_callback_function_, this, _1) );
     topic_pub_ = nh_.advertise<geometry_msgs::Twist>(\"/cmd_vel_\", 1);
 
-    thread_name_ = std::thread(boost::bind(&$1_cls::thread_function_, this));
+    thread_name_ = std::thread(boost::bind(&$1::thread_function_, this));
 
-    timer_ =  nh_.createTimer(1.0, &$1_cls::timer_callback_function_, this, false, false);  // one_shot=false(default), auto_start=false
+    timer_ =  nh_.createTimer(1.0, &$1::timer_callback_function_, this, false, false);  // one_shot=false(default), auto_start=false
     timer_.start();
 }
 
-$1_cls::~$1_cls()
+$1::~$1()
 {
     thread_name_.join();
 }
 
-void $1_cls::thread_function_()
+void $1::thread_function_()
 {
     ros::Rate rate(10);
 
@@ -267,14 +273,16 @@ void $1_cls::thread_function_()
     }
 }
 
-void $1_cls::topic_callback_function_(const geometry_msgs::Twist::ConstPtr &msg)
+void $1::topic_callback_function_(const geometry_msgs::Twist::ConstPtr &msg)
 {
     ROS_WARN(\"Received topic...\");
 }
 
-void $1_cls::timer_callback_function_(const ros::TimerEvent& event)
+void $1::timer_callback_function_(const ros::TimerEvent& event)
 {
     ROS_ERROR(\"Timer callback...\");
+}
+
 }
 "  >> ./$1/src/$1.cpp
 
@@ -287,7 +295,7 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh(\"~\");
 
-    $1_cls $1;
+    $1::$1 $1;
 
     ros::spin();
 
